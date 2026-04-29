@@ -2,6 +2,11 @@ name: Bytenut Auto Renew
 
 on:
   workflow_dispatch:
+    inputs:
+      force_run:
+        description: '是否强制执行，false 时也会检查下次运行时间'
+        required: false
+        default: 'true'
   schedule:
     - cron: '5 * * * *'
 
@@ -23,7 +28,7 @@ jobs:
       env:
         REPO_TOKEN: ${{ secrets.REPO_TOKEN }}
       run: |
-        if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+        if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ "${{ github.event.inputs.force_run }}" != "false" ]; then
           echo "should_run=true" >> "$GITHUB_OUTPUT"
           echo "[INFO] 手动运行，跳过下次运行时间检查"
           exit 0
