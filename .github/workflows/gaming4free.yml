@@ -1,8 +1,8 @@
 name: gaming4free renew
 on:
-  #schedule:
-  #  - cron: '*/30 * * * *'
   workflow_dispatch:
+  # schedule:
+  #   - cron: '*/30 * * * *'
 jobs:
   run:
     runs-on: ubuntu-22.04
