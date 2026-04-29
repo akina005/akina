@@ -7,8 +7,6 @@ on:
         description: '是否强制执行，false 时也会检查下次运行时间'
         required: false
         default: 'true'
-  schedule:
-    - cron: '5 * * * *'
 
 # ⚠️ 必须添加权限配置，允许 Action 修改仓库文件
 permissions:
@@ -30,7 +28,7 @@ jobs:
       run: |
         if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ "${{ github.event.inputs.force_run }}" != "false" ]; then
           echo "should_run=true" >> "$GITHUB_OUTPUT"
-          echo "[INFO] 手动运行，跳过下次运行时间检查"
+          echo "[INFO] 手动/外部触发，跳过下次运行时间检查"
           exit 0
         fi
 
