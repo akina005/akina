@@ -1,18 +1,13 @@
-name: Add Godlike Server Time
-
-
-
+name: Godlike 续期
 on:
   schedule:
-    - cron: '0 */3 * * *'   # 每3小时运行一次
-    - cron: '30 1-23/3 * * *' # 从01:30开始，每3小时+90分钟运行一次（即90分钟间隔）
-  workflow_dispatch:        # 允许手动触发
+    - cron: '0 */3 * * *'   
+    - cron: '30 1-23/3 * * *' 
+  workflow_dispatch:        
 
 jobs:
   add_time_job:
     runs-on: ubuntu-latest
-    # 由于脚本现在是单次运行，不再需要长时间的 timeout
-    # 设置一个合理的超时，例如10分钟，防止意外卡死
     timeout-minutes: 10
 
     steps:
@@ -37,7 +32,6 @@ jobs:
         env:
           godlike_PTERODACTYL_COOKIE: ${{ secrets.godlike_PTERODACTYL_COOKIE }}
           godlike_PTERODACTYL: ${{ secrets.godlike_PTERODACTYL }}
-        # 使用 -u 参数禁用输出缓冲，确保日志实时显示
         working-directory: private-scripts/scripts/godlike
         run: python -u main.py
 
@@ -56,7 +50,6 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
-          # 如果 time.txt 不存在，说明是第一次运行
           if [ ! -f scripts/godlike/time.txt ]; then
             echo "首次生成时间：$(date +'%Y-%m-%d %H:%M:%S')" > scripts/godlike/time.txt
           else
@@ -65,7 +58,6 @@ jobs:
 
           git add scripts/godlike/time.txt
 
-          # 如果有更改再提交
           if git diff --cached --quiet; then
             echo "无变化，无需提交"
           else
