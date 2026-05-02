@@ -268,30 +268,6 @@ jobs:
           name: error-screenshots
           path: private-scripts/scripts/godlike/*.png
 
-      - name: Commit time.txt to private scripts repo
-        env:
-          REPO_TOKEN: ${{ secrets.REPO_TOKEN }}
-        working-directory: private-scripts
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-
-          if [ ! -f scripts/godlike/time.txt ]; then
-            echo "首次生成时间：$(date +'%Y-%m-%d %H:%M:%S')" > scripts/godlike/time.txt
-          else
-            echo "$(date +'%Y-%m-%d %H:%M:%S')" > scripts/godlike/time.txt
-          fi
-
-          git add scripts/godlike/time.txt
-
-          if git diff --cached --quiet; then
-            echo "无变化，无需提交"
-          else
-            git commit -m "Update godlike time file: $(date +'%Y-%m-%d %H:%M:%S')"
-            git pull --rebase origin main
-            git push origin HEAD:main
-          fi
-
       - name: Clean workflow runs
         if: always()
         uses: Mattraks/delete-workflow-runs@v2
