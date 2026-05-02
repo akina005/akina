@@ -35,7 +35,7 @@ jobs:
 
       - name: Run Time Adder Script
         env:
-          PTERODACTYL_COOKIE: ${{ secrets.PTERODACTYL_COOKIE }}
+          godlike_PTERODACTYL_COOKIE: ${{ secrets.godlike_PTERODACTYL_COOKIE }}
           godlike_PTERODACTYL: ${{ secrets.godlike_PTERODACTYL }}
         # 使用 -u 参数禁用输出缓冲，确保日志实时显示
         working-directory: private-scripts/scripts/godlike
