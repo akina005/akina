@@ -363,57 +363,57 @@ jobs:
           # 使用 xvfb-run 分配虚拟屏幕，让 xdotool 能够正常点击
           xvfb-run -a python private-scripts/scripts/Icehost/main.py 2>&1 | tee renew.log
 
-      - name: 自动修改下一次运行时间
-        env:
-          GITHUB_TOKEN: ${{ secrets.REPO_TOKEN }}
-          WORKFLOW_FILE: .github/workflows/Icehost.yml
-        run: |
-          python3 << 'EOF'
-          import os
-          import re
-          from datetime import datetime, timedelta
-
-          workflow_file = os.environ.get("WORKFLOW_FILE")
-          now_utc = datetime.utcnow()
-
-          with open("renew.log", "r", encoding="utf-8") as f:
-              log_content = f.read()
-
-          match = re.search(r"NEXT_RUN_UTC:\s*(\d{4}-\d{2}-\d{2}\s+\d{2}:\d{2})", log_content)
-          if match:
-              target_date = datetime.strptime(match.group(1), "%Y-%m-%d %H:%M")
-          else:
-              target_date = now_utc + timedelta(hours=4)
-
-          if target_date <= now_utc:
-              target_date = now_utc + timedelta(hours=1)
-
-          new_cron = f"{target_date.minute} {target_date.hour} {target_date.day} {target_date.month} *"
-          next_date_str = f"{target_date.strftime('%Y-%m-%d %H:%M')} UTC"
-
-          with open(workflow_file, "r", encoding="utf-8") as f:
-              content = f.read()
-
-          new_content = re.sub(
-              r"- cron: '.*?'.*",
-              f"- cron: '{new_cron}' # 下一个: {next_date_str}",
-              content,
-              count=1,
-          )
-
-          with open(workflow_file, "w", encoding="utf-8") as f:
-              f.write(new_content)
-
-          print(f"✅ 已更新下一次运行时间: {new_cron} ({next_date_str})")
-          EOF
-
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git add $WORKFLOW_FILE
-          git commit -m "auto: update Icehost renewal schedule" || echo "没有变更需要提交"
-          git remote set-url origin https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.repository }}.git
-          git pull --rebase origin main
-          git push origin HEAD:main
+      # - name: 自动修改下一次运行时间
+      #   env:
+      #     GITHUB_TOKEN: ${{ secrets.REPO_TOKEN }}
+      #     WORKFLOW_FILE: .github/workflows/Icehost.yml
+      #   run: |
+      #     python3 << 'EOF'
+      #     import os
+      #     import re
+      #     from datetime import datetime, timedelta
+      #
+      #     workflow_file = os.environ.get("WORKFLOW_FILE")
+      #     now_utc = datetime.utcnow()
+      #
+      #     with open("renew.log", "r", encoding="utf-8") as f:
+      #         log_content = f.read()
+      #
+      #     match = re.search(r"NEXT_RUN_UTC:\s*(\d{4}-\d{2}-\d{2}\s+\d{2}:\d{2})", log_content)
+      #     if match:
+      #         target_date = datetime.strptime(match.group(1), "%Y-%m-%d %H:%M")
+      #     else:
+      #         target_date = now_utc + timedelta(hours=4)
+      #
+      #     if target_date <= now_utc:
+      #         target_date = now_utc + timedelta(hours=1)
+      #
+      #     new_cron = f"{target_date.minute} {target_date.hour} {target_date.day} {target_date.month} *"
+      #     next_date_str = f"{target_date.strftime('%Y-%m-%d %H:%M')} UTC"
+      #
+      #     with open(workflow_file, "r", encoding="utf-8") as f:
+      #         content = f.read()
+      #
+      #     new_content = re.sub(
+      #         r"- cron: '.*?'.*",
+      #         f"- cron: '{new_cron}' # 下一个: {next_date_str}",
+      #         content,
+      #         count=1,
+      #     )
+      #
+      #     with open(workflow_file, "w", encoding="utf-8") as f:
+      #         f.write(new_content)
+      #
+      #     print(f"✅ 已更新下一次运行时间: {new_cron} ({next_date_str})")
+      #     EOF
+      #
+      #     git config --global user.name "github-actions[bot]"
+      #     git config --global user.email "github-actions[bot]@users.noreply.github.com"
+      #     git add $WORKFLOW_FILE
+      #     git commit -m "auto: update Icehost renewal schedule" || echo "没有变更需要提交"
+      #     git remote set-url origin https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.repository }}.git
+      #     git pull --rebase origin main
+      #     git push origin HEAD:main
 
       - name: 清理运行记录
         if: always()
