@@ -61,6 +61,19 @@ jobs:
                           print(f"::add-mask::{part}")
           PY
 
+          SERVER_URL=$(python - <<'PY'
+          import re
+          from pathlib import Path
+
+          text = Path("private-scripts/scripts/godlike/main.py").read_text(encoding="utf-8", errors="ignore")
+          match = re.search(r"^SERVER_URL\s*=\s*(?:os\.environ\.get\([^,]+,\s*)?(['\"])(.*?)\1", text, re.M)
+          print(match.group(2) if match else "")
+          PY
+          )
+          if [ -n "$SERVER_URL" ]; then
+            echo "SERVER_URL=$SERVER_URL" >> "$GITHUB_ENV"
+          fi
+
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
@@ -181,6 +194,8 @@ jobs:
           godlike_PTERODACTYL: ${{ secrets.godlike_PTERODACTYL }}
           BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
           TG_CHAT_ID: ${{ secrets.TG_CHAT_ID }}
+          SERVER_URL: ${{ env.SERVER_URL }}
+          SOCKS5_PROXY: socks5://127.0.0.1:10808
           PLAYWRIGHT_PROXY_SERVER: socks5://127.0.0.1:10808
         working-directory: private-scripts/scripts/godlike
         run: |
