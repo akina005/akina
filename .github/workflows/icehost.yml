@@ -351,12 +351,12 @@ jobs:
       - name: 🚀 运行 Icehost Python 脚本
         env:
           Icehost: ${{ secrets.Icehost }}
-          ICEHOST_SESSION: ${{ secrets.ICEHOST_SESSION }}
+          ICEHOST_COOKIE: ${{ secrets.ICEHOST_COOKIE }}
           Ice_PROXY_NODE: ${{ env.PROXY_SERVER }}
           BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
           TG_CHAT_ID: ${{ secrets.TG_CHAT_ID }}
         run: |
-          echo "::add-mask::$ICEHOST_SESSION"
+          echo "::add-mask::$ICEHOST_COOKIE"
           echo "::add-mask::$Ice_PROXY_NODE"
           echo "::add-mask::$BOT_TOKEN"
           echo "::add-mask::$TG_CHAT_ID"
