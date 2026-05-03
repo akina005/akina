@@ -19,17 +19,38 @@ jobs:
 
       - name: Install Xray
         run: |
-          wget -q https://github.com/XTLS/Xray-core/releases/latest/download/Xray-linux-64.zip
+          if [ -z "${{ secrets.Ateex_ROXY_NODE }}" ]; then
+            echo "[proxy] Ateex_ROXY_NODE 未配置，使用直连"
+            echo "Ateex_PROXY_STATUS=网络模式：直连 ⚠️" >> $GITHUB_ENV
+            exit 0
+          fi
+          if ! wget -q https://github.com/XTLS/Xray-core/releases/latest/download/Xray-linux-64.zip; then
+            echo "[proxy] Xray 下载失败，回退直连"
+            echo "Ateex_PROXY_STATUS=网络模式：直连 ⚠️" >> $GITHUB_ENV
+            exit 0
+          fi
           mkdir -p xray-bin
-          unzip -oq Xray-linux-64.zip -d xray-bin
+          if ! unzip -oq Xray-linux-64.zip -d xray-bin; then
+            echo "[proxy] Xray 解压失败，回退直连"
+            echo "Ateex_PROXY_STATUS=网络模式：直连 ⚠️" >> $GITHUB_ENV
+            exit 0
+          fi
           chmod +x xray-bin/xray
-          sudo mv xray-bin/xray /usr/local/bin/xray
+          if ! sudo mv xray-bin/xray /usr/local/bin/xray; then
+            echo "[proxy] Xray 安装失败，回退直连"
+            echo "Ateex_PROXY_STATUS=网络模式：直连 ⚠️" >> $GITHUB_ENV
+            exit 0
+          fi
 
       - name: Build Xray config
         env:
           PROXY_URL: ${{ secrets.Ateex_ROXY_NODE }}
         run: |
-          python - <<'PY'
+          if [ -z "$PROXY_URL" ]; then
+            echo "[proxy] Ateex_ROXY_NODE 未配置，跳过代理配置"
+            exit 0
+          fi
+          if ! python - <<'PY'
           import base64
           import json
           import os
@@ -171,11 +192,27 @@ jobs:
           with open("xray-config.json", "w", encoding="ascii") as f:
               json.dump(config, f, indent=2)
           PY
+          then
+            echo "[proxy] 代理配置不可用，回退直连"
+            echo "Ateex_PROXY_STATUS=网络模式：直连 ⚠️" >> $GITHUB_ENV
+            rm -f xray-config.json
+          fi
 
       - name: Start Xray proxy
         run: |
+          if [ ! -s xray-config.json ]; then
+            echo "[proxy] 未生成 Xray 配置，使用直连"
+            echo "Ateex_PROXY_STATUS=网络模式：直连 ⚠️" >> $GITHUB_ENV
+            exit 0
+          fi
           nohup xray run -c xray-config.json > xray.log 2>&1 &
           sleep 2
+          if ! pgrep -x xray >/dev/null; then
+            echo "[proxy] Xray 启动失败，回退直连"
+            sed -n '1,20p' xray.log || true
+            echo "Ateex_PROXY_STATUS=网络模式：直连 ⚠️" >> $GITHUB_ENV
+            exit 0
+          fi
           xray version
           sed -n '1,20p' xray.log || true
 
@@ -190,8 +227,24 @@ jobs:
 
       - name: Check IP
         run: |
-          curl -s --proxy http://127.0.0.1:8080 https://api.ipify.org && echo
-          curl -s --proxy http://127.0.0.1:8080 https://ipinfo.io
+          if [ ! -s xray-config.json ] || ! pgrep -x xray >/dev/null; then
+            echo "[proxy] 使用直连"
+            echo "Ateex_PROXY_STATUS=网络模式：直连 ⚠️" >> $GITHUB_ENV
+            curl -s https://api.ipify.org && echo
+            curl -s https://ipinfo.io
+            exit 0
+          fi
+          if curl -fsS --max-time 15 --proxy http://127.0.0.1:8080 https://api.ipify.org >/tmp/ateex_proxy_ip; then
+            echo "[proxy] 代理可用，出口 IP: $(cat /tmp/ateex_proxy_ip)"
+            echo "Ateex_RUNTIME_PROXY=127.0.0.1:8080" >> $GITHUB_ENV
+            echo "Ateex_PROXY_STATUS=网络模式：代理" >> $GITHUB_ENV
+            curl -s --proxy http://127.0.0.1:8080 https://ipinfo.io
+          else
+            echo "[proxy] 代理不可用，回退直连"
+            echo "Ateex_PROXY_STATUS=网络模式：直连 ⚠️" >> $GITHUB_ENV
+            curl -s https://api.ipify.org && echo
+            curl -s https://ipinfo.io
+          fi
 
       - name: Fetch private Ateex script
         env:
