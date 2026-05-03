@@ -248,7 +248,7 @@ jobs:
       working-directory: scripts/greathost
       env:
         GREATHOST: ${{ secrets.GREATHOST }}
-        TG_BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
+        BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
         TG_CHAT_ID: ${{ secrets.TG_CHAT_ID }}
         GREATHOST_BROWSER_PROXY: ${{ env.GREATHOST_BROWSER_PROXY }}
         GREATHOST_PROXY_STATUS: ${{ env.GREATHOST_PROXY_STATUS }}
