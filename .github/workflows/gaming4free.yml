@@ -1,4 +1,4 @@
-name: gaming4free renew
+name: gaming4free 自动续期
 on:
   workflow_dispatch:
   # schedule:
@@ -8,45 +8,55 @@ jobs:
     runs-on: ubuntu-22.04
     timeout-minutes: 30
     steps:
-      - uses: actions/checkout@v4
-      - name: Checkout private repo
+      - name: 检出当前仓库
+        uses: actions/checkout@v4
+      - name: 检出私有脚本仓库
         uses: actions/checkout@v4
         with:
           repository: akina005/scripts
           token: ${{ secrets.REPO_TOKEN }}
           path: private-repo
-      - name: Setup Node
+      - name: 设置 Node 环境
         uses: actions/setup-node@v4
         with:
           node-version: 20
-      - name: Enable WARP
+      - name: 启用 WARP 网络
         continue-on-error: true
         uses: fscarmen/warp-on-actions@v1.3
         with:
           stack: dual
           mode: client
-      - name: Install deps
+      - name: 安装系统和识别依赖
         timeout-minutes: 12
         run: |
           sudo apt-get update -o Acquire::Retries=3
           sudo apt-get install -y --no-install-recommends -o Acquire::Retries=3 xvfb wget unzip curl jq p7zip-full \
             ffmpeg python3 python3-pip
           python3 -m pip install --quiet SpeechRecognition pydub
-      - name: Install playwright
+      - name: 安装 Playwright 浏览器
         timeout-minutes: 10
         run: |
           cd private-repo/scripts/gm4
           npm install
           npx playwright install chromium
-      - name: Check IP
+      - name: 检查当前出口 IP
         run: |
           curl -s https://api.ipify.org
           echo
           curl -s https://ipinfo.io
-      - name: Run script
+      - name: 执行自动续期脚本
         env:
           BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
           TG_CHAT_ID: ${{ secrets.TG_CHAT_ID }}
         run: |
           mkdir -p private-repo/scripts/gm4/screenshots
           xvfb-run -a node private-repo/scripts/gm4/renew.js
+      - name: 清理旧的工作流运行记录
+        if: always()
+        uses: Mattraks/delete-workflow-runs@v2
+        with:
+          token: ${{ github.token }}
+          repository: ${{ github.repository }}
+          delete_workflow_pattern: ${{ github.workflow }}
+          retain_days: 0
+          keep_minimum_runs: 4
