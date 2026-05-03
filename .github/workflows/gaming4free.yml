@@ -1,4 +1,4 @@
-name: gaming4free 自动续期
+name: gaming4free 续期
 on:
   workflow_dispatch:
   # schedule:
