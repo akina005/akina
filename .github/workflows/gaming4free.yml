@@ -22,10 +22,11 @@ jobs:
           node-version: 20
       - name: 启用 WARP 网络
         continue-on-error: true
+        timeout-minutes: 5
         uses: fscarmen/warp-on-actions@v1.3
         with:
           stack: dual
-          mode: client
+          mode: wireguard
       - name: 安装系统和识别依赖
         timeout-minutes: 12
         run: |
