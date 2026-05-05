@@ -1,6 +1,16 @@
 [
   {
     "domain": ".runox.io",
+    "expiry": 1812542202,
+    "httpOnly": false,
+    "name": "_ga_H0NP6EQBEV",
+    "path": "/",
+    "sameSite": "Lax",
+    "secure": true,
+    "value": "GS2.1.s1777982179$o1$g1$t1777982202$j51$l0$h0"
+  },
+  {
+    "domain": ".runox.io",
     "expiry": 1778587028,
     "httpOnly": true,
     "name": "session",
@@ -18,15 +28,5 @@
     "sameSite": "Lax",
     "secure": true,
     "value": "GA1.1.600776141.1777982179"
-  },
-  {
-    "domain": ".runox.io",
-    "expiry": 1812542202,
-    "httpOnly": false,
-    "name": "_ga_H0NP6EQBEV",
-    "path": "/",
-    "sameSite": "Lax",
-    "secure": true,
-    "value": "GS2.1.s1777982179$o1$g1$t1777982202$j51$l0$h0"
   }
 ]
