@@ -20,13 +20,6 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
-      - name: 启用 WARP 网络
-        continue-on-error: true
-        timeout-minutes: 5
-        uses: fscarmen/warp-on-actions@v1.3
-        with:
-          stack: dual
-          mode: wireguard
       - name: 安装系统和识别依赖
         timeout-minutes: 12
         run: |
@@ -40,6 +33,13 @@ jobs:
           cd private-repo/scripts/gm4
           npm install
           npx playwright install chromium
+      - name: 启用 WARP 网络
+        continue-on-error: true
+        timeout-minutes: 5
+        uses: fscarmen/warp-on-actions@v1.3
+        with:
+          stack: ipv4
+          mode: wireguard
       - name: 检查当前出口 IP
         run: |
           curl -s https://api.ipify.org
