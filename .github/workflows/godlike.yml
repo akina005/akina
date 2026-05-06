@@ -87,7 +87,7 @@ jobs:
 
       - name: Install Xray
         run: |
-          curl -fL --retry 3 -o Xray-linux-64.zip "https://github.com/akina005/akina/releases/download/v1.0.0/Xray-linux-64.zip"
+          curl -fL --retry 3 -o Xray-linux-64.zip "https://github.com/akina005/akina/releases/download/proxy/Xray-linux-64.zip"
           unzip -q Xray-linux-64.zip -d xray
           chmod +x xray/xray
           sudo install -m 755 xray/xray /usr/local/bin/xray
