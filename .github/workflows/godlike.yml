@@ -87,7 +87,11 @@ jobs:
 
       - name: Install Xray
         run: |
-          sudo bash -c "$(curl -L https://github.com/XTLS/Xray-install/raw/main/install-release.sh)" @ install
+          curl -fL --retry 3 -o Xray-linux-64.zip "https://github.com/akina005/akina/releases/download/v1.0.0/Xray-linux-64.zip"
+          unzip -q Xray-linux-64.zip -d xray
+          chmod +x xray/xray
+          sudo install -m 755 xray/xray /usr/local/bin/xray
+          xray version
 
       - name: Configure proxy node
         env:
