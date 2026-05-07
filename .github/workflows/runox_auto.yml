@@ -31,8 +31,15 @@ jobs:
 
       - name: 安装系统依赖
         run: |
-          sudo apt-get update -qq
-          sudo apt-get install -y xvfb scrot python3-xlib unzip wget
+          missing=""
+          command -v xvfb-run >/dev/null 2>&1 || missing="$missing xvfb"
+          command -v unzip >/dev/null 2>&1 || missing="$missing unzip"
+          if [ -n "$missing" ]; then
+            sudo apt-get update -qq
+            sudo apt-get install -y $missing
+          else
+            echo "[INFO] 系统依赖已存在，跳过 apt 安装"
+          fi
 
       - name: 安装并测试代理
         env:
@@ -44,7 +51,7 @@ jobs:
           fi
 
           echo "::add-mask::${RUNOX_PROXY_NODE}"
-          wget -q https://github.com/oyz6/action/releases/download/proxy/Xray-linux-64.zip
+          curl -fsSL https://github.com/akina005/akina/releases/download/proxy/Xray-linux-64.zip -o Xray-linux-64.zip
           unzip -q Xray-linux-64.zip -d xray
           chmod +x xray/xray
 
@@ -278,4 +285,4 @@ jobs:
           repository: ${{ github.repository }}
           delete_workflow_pattern: ${{ github.workflow }}
           retain_days: 0
-          keep_minimum_runs: 4
+          keep_minimum_runs: 2
