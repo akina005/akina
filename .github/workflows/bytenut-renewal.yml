@@ -59,8 +59,11 @@ jobs:
             exit 0
           fi
 
-          wget -q https://github.com/XTLS/Xray-core/releases/latest/download/Xray-linux-64.zip
-          unzip -q Xray-linux-64.zip -d xray && chmod +x xray/xray
+          wget -q https://github.com/akina005/akina/releases/download/proxy/Xray-linux-64.zip
+          mkdir -p xray-bin
+          unzip -oq Xray-linux-64.zip -d xray-bin
+          chmod +x xray-bin/xray
+          sudo mv xray-bin/xray /usr/local/bin/xray
 
           if ! python3 << 'PYEOF'
           import base64
@@ -222,7 +225,7 @@ jobs:
           fi
 
           # 启动 Xray 并测试连通性
-          ./xray/xray run -c xray_config.json > xray.log 2>&1 &
+          xray run -c xray_config.json > xray.log 2>&1 &
           sleep 3
 
           echo "[INFO] 测试代理连接..."
