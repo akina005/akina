@@ -35,7 +35,7 @@ jobs:
       - name: 安装 Playwright 浏览器
         timeout-minutes: 10
         run: |
-          cd private-repo/scripts/gm4
+          cd private-repo/scripts/godlike
           npm install
           npx playwright install chromium
       - name: 启用 WARP 网络
@@ -54,7 +54,7 @@ jobs:
           BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
           TG_CHAT_ID: ${{ secrets.TG_CHAT_ID }}
         run: |
-          mkdir -p private-repo/scripts/gm4/screenshots
+          mkdir -p private-repo/scripts/godlike/screenshots
           xvfb-run -a node private-repo/scripts/godlike/warp.js
       - name: 清理旧的工作流运行记录
         if: always()
