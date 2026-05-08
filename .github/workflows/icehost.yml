@@ -33,6 +33,9 @@ jobs:
 
       - name: 📦 安装底层依赖与浏览器
         run: |
+          # GitHub Actions 的 Azure Ubuntu 镜像偶发超时，改用 Ubuntu 官方源。
+          sudo sed -i 's|http://azure.archive.ubuntu.com/ubuntu|https://archive.ubuntu.com/ubuntu|g' /etc/apt/sources.list.d/ubuntu.sources
+
           # 【核心】安装 xdotool(用于物理点击) 和 xvfb(虚拟屏幕)
           sudo apt-get update
           sudo apt-get install -y xvfb xdotool
