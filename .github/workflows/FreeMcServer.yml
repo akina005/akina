@@ -5,6 +5,11 @@ on:
 #    # 每 2 小时 30 分运行一次
 #    - cron: '30 */2 * * *'
   workflow_dispatch:
+    inputs:
+      retry:
+        description: '是否为一次性重试运行'
+        required: false
+        default: 'false'
 
 jobs:
   renew:
@@ -224,13 +229,33 @@ jobs:
           fi
 
       - name: 执行续订脚本
+        id: freemc_run
+        continue-on-error: true
         env:
           FREEMCSERVER: ${{ secrets.FREEMCSERVER }}
           BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
           TG_CHAT_ID: ${{ secrets.TG_CHAT_ID }}
           PROXY_SERVER: ${{ env.PROXY_SERVER }}
+          FREEMC_RETRY_RUN: ${{ github.event.inputs.retry == 'true' && 'true' || 'false' }}
         run: |
           xvfb-run -a python scripts/FreeMcServer/main.py
+
+      - name: 失败后重开一次工作流
+        if: steps.freemc_run.outcome == 'failure' && github.event.inputs.retry != 'true'
+        env:
+          GH_TOKEN: ${{ secrets.REPO_TOKEN }}
+        run: |
+          gh workflow run "${{ github.workflow }}" \
+            --repo "${{ github.repository }}" \
+            --ref "${{ github.ref_name }}" \
+            -f retry=true
+          exit 1
+
+      - name: 重试后仍失败则停止
+        if: steps.freemc_run.outcome == 'failure' && github.event.inputs.retry == 'true'
+        run: |
+          echo "[ERROR] FreeMcServer 第二轮仍未成功，已停止自动重试。"
+          exit 1
 
 #      - name: 上传截图
 #        if: always()
