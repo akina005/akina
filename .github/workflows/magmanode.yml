@@ -384,7 +384,7 @@ jobs:
           # 使用 xvfb-run 分配虚拟屏幕，让 xdotool 能够正常点击
           xvfb-run -a python main.py
 
-      - name: 🧹 清理旧的运行记录 (仅保留最近 5 个)
+      - name: 🧹 清理旧的运行记录 
         if: always()
         uses: Mattraks/delete-workflow-runs@v2
         with:
@@ -392,4 +392,4 @@ jobs:
           repository: ${{ github.repository }}
           delete_workflow_pattern: ${{ github.workflow }}
           retain_days: 0
-          keep_minimum_runs: 2
+          keep_minimum_runs: 4
