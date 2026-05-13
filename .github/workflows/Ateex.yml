@@ -221,8 +221,10 @@ jobs:
           DEBIAN_FRONTEND: noninteractive
           NEEDRESTART_MODE: a
         run: |
-          sudo -E apt-get update -qq
-          sudo -E apt-get install -y -qq -o Dpkg::Use-Pty=0 xvfb p7zip-full ffmpeg xdotool scrot 2>&1 | tail -5
+          if ! command -v xvfb-run >/dev/null; then
+            sudo -E apt-get update -qq
+            sudo -E apt-get install -y -qq -o Dpkg::Use-Pty=0 xvfb
+          fi
           pip install --quiet seleniumbase requests
 
       - name: Check IP
