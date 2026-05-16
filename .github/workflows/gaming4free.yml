@@ -28,9 +28,11 @@ jobs:
         run: |
           sudo apt-get update -o Acquire::Retries=3
           sudo apt-get install -y --no-install-recommends -o Acquire::Retries=3 xvfb unzip curl xz-utils
-          curl -L --retry 3 --connect-timeout 10 \
+          curl -fL --retry 3 --connect-timeout 10 \
+            -H "Authorization: Bearer ${{ github.token }}" \
+            -H "Accept: application/octet-stream" \
             -o /tmp/ffmpeg-release-amd64-static.tar.xz \
-            https://github.com/akina005/akina/releases/download/ffmpeg/ffmpeg-release-amd64-static.tar.xz
+            https://api.github.com/repos/akina005/akina/releases/assets/414344188
           tar -xf /tmp/ffmpeg-release-amd64-static.tar.xz -C /tmp
           sudo install -m 755 /tmp/ffmpeg-*-amd64-static/ffmpeg /usr/local/bin/ffmpeg
           sudo install -m 755 /tmp/ffmpeg-*-amd64-static/ffprobe /usr/local/bin/ffprobe
