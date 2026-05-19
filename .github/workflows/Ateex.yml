@@ -273,7 +273,7 @@ jobs:
           BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
           TG_CHAT_ID: ${{ secrets.TG_CHAT_ID }}
           REPO_TOKEN: ${{ secrets.REPO_TOKEN }}
-          GITHUB_REPOSITORY: akina005/scripts
+          Ateex_COOKIE_REPOSITORY: akina005/scripts
           Ateex_COOKIE_REPO_PATH: scripts/Ateex/cookie.txt
         run: |
           mkdir -p screenshots
